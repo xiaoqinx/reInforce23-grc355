@@ -1,0 +1,33 @@
+repos:
+-   repo: local
+    hooks:
+    -   id: cfn-lint
+        name: AWS CloudFormation Lint
+        description: Validate template against CloudFormation Resource Specification
+        entry: cfn-lint templates/*.yaml -i W -i E3001 E0000
+        language: python
+        additional_dependencies:
+          - cfn-lint
+        files: \.(json|yaml|yml|templates\.json|template)$
+        pass_filenames: false
+
+    -   id: cfn-nag
+        name: AWS CloudFormation Nag
+        description: Looks for patterns in CloudFormation templates that may indicate insecure infrastructure.
+        entry: cfn_nag_scan --input-path templates
+        language: ruby
+        additional_dependencies:
+          - cfn-nag
+        files: \.(json|yaml|yml|templates\.json|template)$
+        pass_filenames: false
+
+    -   id: cfn-guard
+        name: AWS CloudFormation Guard
+        description: Validate template against your Guard rules
+        entry: cfn-guard validate -r cfn-guard -d templates
+        language: rust
+        additional_dependencies:
+          - cli:cfn-guard
+        files: \.(json|yaml|yml|template\.json|template)$
+        pass_filenames: false
+        

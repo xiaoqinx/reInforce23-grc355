@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Builder Session - Service Catalog Product Association
+Parameters:
+  PortfolioStackName:
+    Type: String
+    Default: sc-portfolio
+    Description: Enter the Service Catalog Portfolio stack name
+  ProductStackName:
+    Type: String
+    Description: Enter the Service Catalog Product stack name to be associated with the portfolio
+Resources:
+################## PRODUCT ASSOCIATIONS #################
+  ProductAssociation:
+    Type: AWS::ServiceCatalog::PortfolioProductAssociation
+    Properties: 
+      PortfolioId:
+        Fn::ImportValue:
+          !Sub "${PortfolioStackName}-PortfolioId"
+      ProductId: 
+        Fn::ImportValue:
+          !Sub "${ProductStackName}-ProductPA"
+
+################## LAUNCH ROLE CONSTRAINT #################
+  LaunchRoleConst:
+    Type: AWS::ServiceCatalog::LaunchRoleConstraint
+    Properties:
+      Description: Service Catalog uses this role to launch the product
+      PortfolioId: 
+        Fn::ImportValue:
+          !Sub "${PortfolioStackName}-PortfolioId"
+      ProductId:
+        Fn::ImportValue:
+          !Sub "${ProductStackName}-ProductPA"
+      RoleArn: 
+        Fn::ImportValue:
+          !Sub "${PortfolioStackName}-LaunchRole"
+    DependsOn:
+      - ProductAssociation

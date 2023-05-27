@@ -1,0 +1,4 @@
+let eks_cluster = Resources.* [ Type == 'AWS::EKS::Cluster' ]
+rule eks_public_disallowed when %eks_cluster !empty {
+      %eks_cluster.Properties.ResourcesVpcConfig.EndpointPublicAccess == false
+}

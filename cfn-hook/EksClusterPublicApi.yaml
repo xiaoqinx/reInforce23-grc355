@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: 'Activating EksClusterPublicApi Hook' 
+Resources:
+  EksClusterPublicApi:
+    Type: AWS::CloudFormation::TypeActivation
+    Properties: 
+      ExecutionRoleArn: !GetAtt EksClusterPublicApiRole.Arn
+      PublicTypeArn: !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}::type/hook/096debcd443a84c983955f8f8476c221b2b08d8b/AWSSamples-EksClusterPublicApi-Hook"
+
+  EksClusterPublicApiRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: 
+                - resources.cloudformation.amazonaws.com
+                - hooks.cloudformation.amazonaws.com
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              StringLike:
+                aws:SourceArn: !Sub "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:type/hook/AWSSamples-EksClusterPublicApi-Hook/*"
+
+  EksClusterPublicApiTypeConfig:
+    Type: AWS::CloudFormation::HookTypeConfig
+    Properties:
+      TypeArn: !Ref EksClusterPublicApi
+      Configuration: '{"CloudFormationConfiguration":{"HookConfiguration":{"TargetStacks":"ALL","FailureMode":"FAIL","Properties":{}}}}'

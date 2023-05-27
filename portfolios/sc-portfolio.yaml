@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Builder Session - Service Catalog Portfolio
+Parameters:
+  PortfolioName:
+    Type: String
+    Default: Kubernetes_Portfolio
+    Description: Enter the portfolio name
+  PortfolioDesc:
+    Type: String
+    Default: Collection of demo service catalog products
+    Description: Enter the portfolio description
+  PortfolioProvider:
+    Type: String
+    Default: Workshop Studio
+    Description: Enter the portfolio provider
+Resources:
+################## PORTFOLIO #################
+  ServiceCatalogPortfolio:
+    Type: AWS::ServiceCatalog::Portfolio
+    Properties: 
+      Description: !Ref PortfolioDesc
+      DisplayName: !Ref PortfolioName
+      ProviderName: !Ref PortfolioProvider
+      Tags: 
+        - Key: Environment
+          Value: Workshop Studio
+
+################## PERMISSIONS AND ROLES #################
+  SCLaunchRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: SELaunchRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: servicecatalog.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - !Join ['', ['arn:', !Ref 'AWS::Partition', ':iam::aws:policy/AdministratorAccess']]
+
+################## GROUP USER & ROLE ASSOCIATION #################
+  TeamRoleAssociation:
+    Type: AWS::ServiceCatalog::PortfolioPrincipalAssociation
+    Properties:
+      PortfolioId: !Ref ServiceCatalogPortfolio
+      PrincipalARN:
+        !Join ['',['arn:aws:iam::',!Ref 'AWS::AccountId',':role/WSParticipantRole']]
+      PrincipalType: IAM
+
+Outputs:
+  PortfolioId:
+    Description: Service Catalog Portfolio Id
+    Value: !Ref ServiceCatalogPortfolio
+    Export:
+      Name: 
+        'Fn::Sub': '${AWS::StackName}-PortfolioId'
+  LaunchRole:
+    Description: Service Catalog Launch Role
+    Value: !GetAtt SCLaunchRole.Arn
+    Export:
+      Name: 
+        'Fn::Sub': '${AWS::StackName}-LaunchRole'

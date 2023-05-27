@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: 'Deploying simple EKS cluster' 
+Parameters:
+  SubnetIds:
+    Description: Select the subnets for the EKS cluster 
+    Type: List<AWS::EC2::Subnet::Id>
+  SecurityGroupIds:
+    Description: Select the security groups for the EKS cluster
+    Type: List<AWS::EC2::SecurityGroup::Id>
+Resources:
+  EKSCluster:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: Prod
+      Version: "1.23"
+      RoleArn: !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/eks-quickstart-ControlPlane"
+      ResourcesVpcConfig:
+        SecurityGroupIds: !Ref SecurityGroupIds
+        SubnetIds: !Ref SubnetIds
+        EndpointPublicAccess: false
+        EndpointPrivateAccess: true
+      Logging:
+        ClusterLogging:
+          EnabledTypes:
+            - Type: api
+            - Type: audit
