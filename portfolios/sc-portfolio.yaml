@@ -46,7 +46,7 @@ Resources:
     Properties:
       PortfolioId: !Ref ServiceCatalogPortfolio
       PrincipalARN:
-        !Join ['',['arn:aws:iam::',!Ref 'AWS::AccountId',':role/WSParticipantRole']]
+        !Join ['',['arn:aws:iam::',!Ref 'AWS::AccountId',':role/Admin']]
       PrincipalType: IAM
 
 Outputs:
